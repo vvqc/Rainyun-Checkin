@@ -351,10 +351,32 @@ if __name__ == "__main__":
         logger.info("正在转到赚取积分页")
         driver.get("https://app.rainyun.com/account/reward/earn")
         driver.implicitly_wait(5)
-        earn = driver.find_element(By.XPATH,
-                                   "//span[contains(text(), '每日签到')]/ancestor::div[1]//a[contains(text(), '领取奖励')]")
-        logger.info("点击赚取积分")
-        earn.click()
+
+        # 检查签到状态：先找"领取奖励"按钮，找不到就检查是否已签到
+        try:
+            earn = driver.find_element(By.XPATH,
+                                       "//span[contains(text(), '每日签到')]/ancestor::div[1]//a[contains(text(), '领取奖励')]")
+            logger.info("点击赚取积分")
+            earn.click()
+        except Exception:
+            # 检查是否已经签到（按钮可能显示"已领取"、"已完成"等）
+            already_signed_patterns = ['已领取', '已完成', '已签到', '明日再来']
+            page_source = driver.page_source
+            for pattern in already_signed_patterns:
+                if pattern in page_source:
+                    logger.info(f"今日已签到（检测到：{pattern}），跳过签到流程")
+                    # 直接跳到获取积分信息
+                    try:
+                        points_raw = driver.find_element(By.XPATH,
+                            '//*[@id="app"]/div[1]/div[3]/div[2]/div/div/div[2]/div[1]/div[1]/div/p/div/h3').get_attribute("textContent")
+                        current_points = int(''.join(re.findall(r'\d+', points_raw)))
+                        logger.info(f"当前剩余积分: {current_points} | 约为 {current_points / 2000:.2f} 元")
+                    except Exception:
+                        logger.info("无法获取当前积分信息")
+                    driver.quit()
+                    exit(0)
+            # 如果既没找到领取按钮，也没检测到已签到，说明页面结构可能变了
+            raise Exception("未找到签到按钮，且未检测到已签到状态，可能页面结构已变更")
         logger.info("处理验证码")
         driver.switch_to.frame("tcaptcha_iframe_dy")
         process_captcha()

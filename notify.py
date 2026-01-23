@@ -331,12 +331,32 @@ def serverJ(title: str, content: str) -> None:
     else:
         url = f'https://sctapi.ftqq.com/{push_config.get("PUSH_KEY")}.send'
 
-    response = requests.post(url, data=data).json()
-
-    if response.get("errno") == 0 or response.get("code") == 0:
-        print("serverJ 推送成功！")
-    else:
-        print(f'serverJ 推送失败！错误码：{response["message"]}')
+    # 添加重试机制和超时处理
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, data=data, timeout=15).json()
+            if response.get("errno") == 0 or response.get("code") == 0:
+                print("serverJ 推送成功！")
+            else:
+                print(f'serverJ 推送失败！错误码：{response.get("message", "未知错误")}')
+            return
+        except requests.exceptions.SSLError as e:
+            print(f"serverJ SSL错误（第{attempt + 1}次）：{e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # 等待2秒后重试
+        except requests.exceptions.Timeout:
+            print(f"serverJ 请求超时（第{attempt + 1}次）")
+            if attempt < max_retries - 1:
+                time.sleep(2)
+        except requests.exceptions.RequestException as e:
+            print(f"serverJ 请求异常（第{attempt + 1}次）：{e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)
+        except Exception as e:
+            print(f"serverJ 未知错误：{e}")
+            return
+    print(f"serverJ 推送失败！已重试{max_retries}次")
 
 
 def pushdeer(title: str, content: str) -> None:
