@@ -54,7 +54,8 @@ https://img.shields.io/badge/Fork-本仓库-4285F4?style=for-the-badge&logo=gith
 ### 🔧 可选环境变量
 | 变量名 | 说明 | 默认值 | 建议设置 |
 |--------|------|--------|----------|
-| `TIMEOUT` | 页面加载超时（秒） | `20` | 网络差可设为 `30` |
+| `TIMEOUT` | 页面加载超时（秒） | `15` | 网络差可设为 `30` |
+| `CAPTCHA_SOLVER_URL` | 腾讯验证码ticket获取接口 | 无 | 建议通过 GitHub Secrets 配置 |
 > 如果需要设置`TIMEOUT`请前往checkin.yml文件取消对应的注释, 并在**Repository Secret**中添加`TIMEOUT`
 
 ### 🔧 高级配置（通常无需修改）
@@ -67,16 +68,16 @@ https://img.shields.io/badge/Fork-本仓库-4285F4?style=for-the-badge&logo=gith
 ```
 Rainyun-Checkin/
 ├── .github/workflows/          # GitHub Actions 工作流
-│   └── checkin.yml      # 自动签到工作流       
-├─ api_client.py      
-├─ config.py          
-├─ cookies.json       
-├─ notify.py          
-├─ rainyun.py         
-├─ README.md          
-├─ requirements.txt   
-├─ server_manager.py  
-└─ stealth.min.js     
+│   └── checkin.yml      # 自动签到工作流
+├─ api_client.py
+├─ config.py
+├─ cookies.json
+├─ notify.py
+├─ rainyun.py
+├─ README.md
+├─ requirements.txt
+├─ server_manager.py
+└─ stealth.min.js
 ```
 
 ## 🔍 故障排除

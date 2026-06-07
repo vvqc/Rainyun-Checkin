@@ -26,10 +26,30 @@ def _read_float(name: str, default: float) -> float:
         return default
 
 
+def _read_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None or value == "":
+        return default
+
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+
+    logger.warning(f"Invalid config: {name} must be bool, using default {default}")
+    return default
+
+
 APP_BASE_URL = os.environ.get("APP_BASE_URL", "https://app.rainyun.com").rstrip("/")
 API_BASE_URL = os.environ.get("API_BASE_URL", "https://api.v2.rainyun.com").rstrip("/")
+CAPTCHA_SOLVER_URL = os.environ.get("CAPTCHA_SOLVER_URL", "").rstrip("/")
 APP_VERSION = os.environ.get("APP_VERSION", "2.5")
 COOKIE_FILE = os.environ.get("COOKIE_FILE", "cookies.json")
+PAGE_TIMEOUT = _read_int("TIMEOUT", 15)
+MAX_DELAY = _read_int("MAX_DELAY", 90)
+DEBUG = _read_bool("DEBUG", False)
+LINUX = _read_bool("LINUX", True)
 
 POINTS_TO_CNY_RATE = _read_int("POINTS_TO_CNY_RATE", 2000)
 CAPTCHA_RETRY_LIMIT = _read_int("CAPTCHA_RETRY_LIMIT", 5)

@@ -12,22 +12,25 @@ on:
 jobs:
   checkin:
     runs-on: ubuntu-latest  # 使用 16GB 内存的 Linux
-    
+
     steps:
     - name: 检出代码
       uses: actions/checkout@v4
-      
+
     - name: 设置 Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        
+
     - name: 安装依赖
       run: pip install -r requirements.txt
-      
+
     - name: 运行
       run: python -u rainyun.py
       env:
         RAINYUN_USER: ${{ secrets.RAINYUN_USER }}
         RAINYUN_PWD: ${{ secrets.RAINYUN_PWD }}
-        # TIMEOUT: ${{ secrets.TIMEOUT }}
+        TIMEOUT: ${{ secrets.TIMEOUT }}
+        TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        TG_USER_ID: ${{ secrets.TG_USER_ID }}
+        CAPTCHA_SOLVER_URL: ${{ secrets.CAPTCHA_SOLVER_URL }}
